@@ -7,6 +7,25 @@ const restaurantList = require('./restaurant.json')
 // require express-handlebars here
 const exphbs = require('express-handlebars')
 
+// function
+function searchRestaurants(keyword) {
+
+  let rawRestaurants = []
+
+  restaurantList.results.forEach((restaurant) => {
+
+    const restaurantData = Object.values(restaurant)
+
+    if (restaurantData.toString().trim().toLocaleLowerCase().includes(keyword)) {
+      rawRestaurants.push(restaurant)
+    }
+
+  })
+
+  return rawRestaurants
+
+}
+
 // setting template engine
 app.engine('handlebars', exphbs({ defaultLayout: 'main' }))
 app.set('view engine', 'handlebars')
@@ -20,10 +39,10 @@ app.get('/', (req, res) => {
 })
 
 app.get('/search', (req, res) => {
-  const keyword = req.query.keyword
-  const restaurants = restaurantList.results.filter((restaurant) => {
-    return keyword.toLocaleLowerCase().trim().includes(keyword.toLocaleLowerCase().trim())
-  })
+  const keyword = req.query.keyword.toString().toLocaleLowerCase().trim()
+  let restaurants = searchRestaurants(keyword)
+
+  console.log(restaurants)
   res.render('index', { restaurants: restaurants, keyword: keyword })
 })
 
